@@ -1,5 +1,9 @@
 #!/usr/bin/python3
+"""Defines the DBStorage engine."""
+
+import os
 import logging
+from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
@@ -10,7 +14,6 @@ from models.place import Place
 from models.review import Review
 from models.amenity import Amenity
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
@@ -25,35 +28,34 @@ class DBStorage:
         """Instantiate a DBStorage object."""
         self.__engine = create_engine(
             "mysql+mysqldb://{}:{}@{}/{}".format(
-                user=os.getenv("HBNB_MYSQL_USER"),
-                password=os.getenv("HBNB_MYSQL_PWD"),
-                host=os.getenv("HBNB_MYSQL_HOST"),
-                db=os.getenv("HBNB_MYSQL_DB"),
+                os.getenv("HBNB_MYSQL_USER"),
+                os.getenv("HBNB_MYSQL_PWD"),
+                os.getenv("HBNB_MYSQL_HOST"),
+                os.getenv("HBNB_MYSQL_DB"),
             ),
             pool_pre_ping=True,
         )
 
-        if getenv("HBNB_ENV") == "test":
+        if os.getenv("HBNB_ENV") == "test":
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """
-        Query on the current database
-        session all objects of the given class.
+        Query on the current database session all objects of the given class.
         """
         try:
-            if cls is None:
-                objs = self.__session.query(State).all()
-                objs.extend(self.__session.query(City).all())
-                objs.extend(self.__session.query(User).all())
-                objs.extend(self.__session.query(Place).all())
-                objs.extend(self.__session.query(Review).all())
-                objs.extend(self.__session.query(Amenity).all())
-            else:
+            objs = []
+            if cls:
                 if isinstance(cls, str):
                     cls = eval(cls)
                 objs = self.__session.query(cls).all()
-            return {"{}.{}".format(type(o).__name__, o.id): o for o in objs}
+            else:
+                for model in [State, City, User, Place, Review, Amenity]:
+                    objs.extend(self.__session.query(model).all())
+            return {
+                "{}.{}".format(type(obj).__name__, obj.id): obj
+                for obj in objs
+            }
         except SQLAlchemyError as e:
             logging.error("Error querying the database: %s", e)
             return {}
@@ -83,8 +85,7 @@ class DBStorage:
 
     def reload(self):
         """
-        Create all tables in the database
-         and initialize a new session.
+        Create all tables in the database and initialize a new session.
         """
         try:
             Base.metadata.create_all(self.__engine)
@@ -100,6 +101,6 @@ class DBStorage:
     def close(self):
         """Close the working SQLAlchemy session."""
         try:
-            self.__session.close()
+            self.__session.remove()  # Using remove() for scoped_session
         except SQLAlchemyError as e:
             logging.error("Error closing the session: %s", e)
