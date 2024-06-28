@@ -161,34 +161,13 @@ class HBNBCommand(cmd.Cmd):
         # Save the new instance and print its ID
         new_instance.save()
         print(new_instance.id)
-    for param in args[1:]:
-        if "=" not in param:
-            continue
-        key, value = param.split("=", 1)
-        value = value.replace("_", " ")
-
-        if value[0] == '"' and value[-1] == '"':
-            value = value[1:-1].replace('\\"', '"')
-        elif "." in value:
-            try:
-                value = float(value)
-            except ValueError:
-                continue
-        else:
-            try:
-                value = int(value)
-            except ValueError:
-                continue
-
-            setattr(new_instance, key, value)
-        storage.save()
-        print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """Help information for the create method"""
         print("Creates a class of any type")
-        print("[Usage]: create <className>\n")
+        print(
+            "[Usage]: create <className> <param1=value1> <param2=value2> ...\n"
+        )
 
     def do_show(self, args):
         """Method to show an individual object"""
