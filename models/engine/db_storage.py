@@ -1,5 +1,7 @@
 #!/usr/bin/python3
-"""Defines the DBStorage engine."""
+"""
+Defines the DBStorage engine.
+"""
 
 import os
 import logging
