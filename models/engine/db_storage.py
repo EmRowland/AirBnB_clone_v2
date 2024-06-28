@@ -9,6 +9,11 @@ from models.user import User
 from models.place import Place
 from models.review import Review
 from models.amenity import Amenity
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class DBStorage:
@@ -21,10 +26,10 @@ class DBStorage:
         """Instantiate a DBStorage object."""
         self.__engine = create_engine(
             "mysql+mysqldb://{}:{}@{}/{}".format(
-                getenv("HBNB_MYSQL_USER"),
-                getenv("HBNB_MYSQL_PWD"),
-                getenv("HBNB_MYSQL_HOST"),
-                getenv("HBNB_MYSQL_DB"),
+                user=os.getenv("HBNB_MYSQL_USER"),
+                password=os.getenv("HBNB_MYSQL_PWD"),
+                host=os.getenv("HBNB_MYSQL_HOST"),
+                db=os.getenv("HBNB_MYSQL_DB"),
             ),
             pool_pre_ping=True,
         )
