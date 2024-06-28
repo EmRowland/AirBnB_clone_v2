@@ -1,7 +1,13 @@
-# tests/test_file_storage_delete.py
+#!/usr/bin/python3
 import unittest
 from models.engine.file_storage import FileStorage
 from models.state import State
+
+"""
+Test file for delete task
+
+"""
+
 
 class TestFileStorageDelete(unittest.TestCase):
     def setUp(self):
@@ -26,6 +32,7 @@ class TestFileStorageDelete(unittest.TestCase):
         state = State()
         state.name = "California"
         self.storage.delete(state)  # Should not raise an exception
+
 
 if __name__ == "__main__":
     unittest.main()
