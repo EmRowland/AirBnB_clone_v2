@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker, scoped_session
